@@ -1,0 +1,40 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - id: account
+        run: echo "ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
+
+      - name: Build and push MySQL
+        uses: docker/build-push-action@v4
+        with:
+          context: ./app
+          file: ./app/Dockerfile_mysql
+          push: true
+          tags: ${{ steps.account.outputs.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-mysql:latest
+
+      - name: Build and push App
+        uses: docker/build-push-action@v4
+        with:
+          context: ./app
+          file: ./app/Dockerfile
+          push: true
+          tags: ${{ steps.account.outputs.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-app:latest
+
