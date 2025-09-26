@@ -25,11 +25,11 @@ jobs:
       # Build and push MySQL image to Docker Hub
       - name: Build MySQL Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/clo835-mysql:latest ./mysql
-          docker push ${{ secrets.DOCKER_USERNAME }}/clo835-mysql:latest
+          docker build -t tarankaur334/clo835-mysql:latest ./mysql
+          docker push tarankaur334/clo835-mysql:latest
 
       # Build and push Web Application image to Docker Hub
       - name: Build Web Application Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/clo835-webapp:latest ./app
-          docker push ${{ secrets.DOCKER_USERNAME }}/clo835-webapp:latest
+          docker build -t tarankaur334/clo835-webapp:latest ./app
+          docker push tarankaur334/clo835-webapp:latest
