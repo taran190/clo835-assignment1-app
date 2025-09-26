@@ -11,30 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository (only using one version)
+      # Checkout repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Configure AWS credentials
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      # Log in to Docker Hub (Using Docker Hub credentials)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
-          aws-region: us-east-1  # Use the region you prefer
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Log in to Amazon ECR (only using one version)
-      - name: Log in to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      # Build and push MySQL image to ECR
+      # Build and push MySQL image to Docker Hub
       - name: Build MySQL Image
         run: |
-          docker build -t clo835-mysql:latest ./mysql
-          docker tag clo835-mysql:latest 471112776853.dkr.ecr.us-east-1.amazonaws.com/clo835-mysql:latest
-          docker push 471112776853.dkr.ecr.us-east-1.amazonaws.com/clo835-mysql:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/clo835-mysql:latest ./mysql
+          docker push ${{ secrets.DOCKER_USERNAME }}/clo835-mysql:latest
 
-      # Build and push Web Application image to ECR
+      # Build and push Web Application image to Docker Hub
       - name: Build Web Application Image
         run: |
-          docker build -t clo835-webapp:latest ./app
-          docker tag clo835-webapp:latest 471112776853.dkr.ecr.us-east-1.amazonaws.com/clo835-webapp:latest
-          docker push 471112776853.dkr.ecr.us-east-1.amazonaws.com/clo835-webapp:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/clo835-webapp:latest ./app
+          docker push ${{ secrets.DOCKER_USERNAME }}/clo835-webapp:latest
