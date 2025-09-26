@@ -11,23 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repository (only using one version)
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1  # Use the region you prefer
 
+      # Log in to Amazon ECR (only using one version)
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
+      # Build and push MySQL image to ECR
       - name: Build MySQL Image
         run: |
           docker build -t clo835-mysql:latest ./mysql
           docker tag clo835-mysql:latest 471112776853.dkr.ecr.us-east-1.amazonaws.com/clo835-mysql:latest
           docker push 471112776853.dkr.ecr.us-east-1.amazonaws.com/clo835-mysql:latest
 
+      # Build and push Web Application image to ECR
       - name: Build Web Application Image
         run: |
           docker build -t clo835-webapp:latest ./app
