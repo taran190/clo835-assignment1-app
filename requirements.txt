@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-Werkzeug==2.2.2
-=======
 Flask==2.2.2
 Werkzeug==2.2.2
 mysql-connector-python
-=======
-Flask==2.2.5
->>>>>>> 75debe1 (Fix requirements.txt)
 
