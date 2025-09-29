@@ -6,28 +6,27 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: us-east-1
 
-      - name: Login to ECR
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 471112776853.dkr.ecr.us-east-1.amazonaws.com
-
-      - name: Build Docker image
-        run: docker build -t clo835-webapp:latest .
-
-      - name: Tag Docker image
-        run: docker tag clo835-webapp:latest 471112776853.dkr.ecr.us-east-1.amazonaws.com/clo835-assignment1-app:latest
-
-      - name: Push Docker image
-        run: docker push 471112776853.dkr.ecr.us-east-1.amazonaws.com/clo835-assignment1-app:latest
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/clo835-assignment1-app:latest
+          echo "Building and pushing $IMAGE_URI"
+          docker build -t $IMAGE_URI ./clo835-assignment1-app/app
+          docker push $IMAGE_URI
